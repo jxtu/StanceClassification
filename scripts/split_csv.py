@@ -1,6 +1,7 @@
 from typing import Sequence
 import pandas as pd
 import numpy as np
+from scripts.text_cleaning import _clean_tweet
 
 
 def combine_tweets(pro_csv_file: str, anti_csv_file: str, out_file: str) -> None:
@@ -23,6 +24,13 @@ def train_test_split(
     portions = np.cumsum(portions, dtype=np.float32) / np.sum(portions)
     row_indices = [[], [], []]
     data_df = pd.read_csv(data_csv)
+    cleaned = []
+    rows = data_df.values
+    for row in rows:
+        tweet = _clean_tweet(row[0])
+        if tweet:
+            cleaned.append([tweet, row[1]])
+    data_df = pd.DataFrame(cleaned, columns=["text", "label"])
     for row_idx in range(len(data_df)):
         i = np.searchsorted(portions, np.random.rand())
         row_indices[i].append(row_idx)
