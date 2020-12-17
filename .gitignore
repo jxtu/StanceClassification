@@ -3,6 +3,7 @@
 data/raw
 .DS_Store
 .idea/
+playground.py
 
 
 # Byte-compiled / optimized / DLL files
