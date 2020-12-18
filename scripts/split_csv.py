@@ -4,12 +4,17 @@ import numpy as np
 from scripts.text_cleaning import _clean_tweet
 
 
-def combine_tweets(pro_csv_file: str, anti_csv_file: str, out_file: str) -> None:
+def combine_tweets(pro_csv_file: str, anti_csv_file: str, use_lockdown: bool, out_file: str) -> None:
     pro_df = pd.read_csv(pro_csv_file)
     anti_df = pd.read_csv(anti_csv_file)
-    # all_tweets = pro_df[["fragment", "lockdown"]].append(anti_df[["fragment", "lockdown"]], ignore_index=True)
-    all_tweets = pro_df[["fragment"]].append(anti_df[["fragment"]], ignore_index=True)
-    all_tweets["label"] = ["pro"] * len(pro_df) + ["anti"] * len(anti_df)
+    if use_lockdown:
+        all_tweets = pro_df[["fragment", "lockdown"]].append(anti_df[["fragment", "lockdown"]], ignore_index=True)
+        all_tweets = all_tweets.loc[all_tweets["lockdown"].isin(["y", "n"])]
+        all_tweets = all_tweets.rename(columns={"lockdown": "label"})
+
+    else:
+        all_tweets = pro_df[["fragment"]].append(anti_df[["fragment"]], ignore_index=True)
+        all_tweets["label"] = ["pro"] * len(pro_df) + ["anti"] * len(anti_df)
     all_tweets = all_tweets.rename(columns={"fragment": "text"})
     all_tweets.to_csv(out_file, index=False)
 
@@ -46,5 +51,5 @@ def train_test_split(
 if __name__ == '__main__':
     pro_file = "../data/raw/INSA_ProReopenAmerica.csv"
     anti_file = "../data/raw/INSA_AntiReopenAmerica.csv"
-    combine_tweets(pro_file, anti_file, "../data/all_tweets.csv")
-    train_test_split("../data/all_tweets.csv")
+    combine_tweets(pro_file, anti_file, use_lockdown=True, out_file="../data/all_tweets_with_lockdown.csv")
+    train_test_split("../data/all_tweets_with_lockdown.csv")
