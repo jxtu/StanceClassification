@@ -10,11 +10,12 @@ predictor = BertClassificationPredictor(
     model_path=MODEL_PATH,
     label_path=LABEL_PATH,
     multi_label=False,
-    model_type='bert',
+    model_type="bert",
     do_lower_case=False,
-    device=device_cuda)
+    device=device_cuda,
+)
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     test_csv_path = "../data/fast_bert_data/test.csv"
     test_df = pd.read_csv(test_csv_path)
     texts = test_df.text.values.tolist()
